@@ -1,0 +1,15 @@
+.git
+.env
+.env.*
+.tools
+.runtime
+.railway
+analisis
+**/node_modules
+**/dist
+**/test-results
+**/playwright-report
+**/*.dump
+**/*.backup
+**/*.log
+**/*.exe

@@ -1,0 +1,57 @@
+name: bia-energy
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: energy
+      POSTGRES_USER: energy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-energy-local-only}
+    ports:
+      - "127.0.0.1:54329:5432"
+    volumes:
+      - energy-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U energy -d energy"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: postgres://energy:${POSTGRES_PASSWORD:-energy-local-only}@db:5432/energy?sslmode=disable
+      ADDR: 0.0.0.0:8080
+      DATA_DIR: /app/data
+      PLANT_TZ: America/Bogota
+      DEMO_EMAIL: ${DEMO_EMAIL:-uribe@energyiq.test}
+      DEMO_PASSWORD: ${DEMO_PASSWORD:-EnergyDemo2026!}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-sonnet-5-5}
+      ANTHROPIC_WORKSPACE_ID: ${ANTHROPIC_WORKSPACE_ID:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-6-luna}
+      AI_ALLOW_NEW_REQUESTS: ${AI_ALLOW_NEW_REQUESTS:-false}
+      CHAT_ENABLED: ${CHAT_ENABLED:-false}
+      CHAT_DAILY_LIMIT: ${CHAT_DAILY_LIMIT:-20}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  web:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:5173:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+volumes:
+  energy-data:

@@ -1,0 +1,23 @@
+/* One short entrance per route; cached screens never wait for a loading animation. */
+@keyframes page-arrive{from{opacity:.35}to{opacity:1}}
+@keyframes card-arrive{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes skeleton-breathe{50%{opacity:.45}}
+.route-stage{animation:page-arrive 220ms ease-out}
+.home-hero,.decision-card,.home-indicators,.home-page .overview-grid,.home-meters,
+.meters-panel,.meters-comparisons .meter-insight,.profile-hero,.profile-card,
+.detail-redesign>.panel,.detail-redesign>.meter-hero{animation:card-arrive 380ms cubic-bezier(.2,.65,.3,1) backwards}
+.decision-card:nth-child(2),.meters-comparisons .meter-insight:nth-child(2){animation-delay:45ms}
+.decision-card:nth-child(3),.meters-comparisons .meter-insight:nth-child(3){animation-delay:90ms}
+.chat-launcher{animation:card-arrive 220ms ease-out backwards}
+.page-skeleton{width:100%}
+.skeleton-hero,.skeleton-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:32px}
+.skeleton-hero{min-height:300px;display:flex;flex-direction:column;justify-content:center}
+.skeleton-cards{display:grid;grid-template-columns:2fr 1fr 1fr;gap:20px;margin-top:28px}
+.skeleton-card{min-height:200px}
+.skeleton-shape{display:block;background:var(--line);border-radius:6px;animation:skeleton-breathe 1.6s ease-in-out infinite}
+.skeleton-heading{height:30px;width:38%;margin-bottom:25px}
+.skeleton-line{height:14px;width:70%;margin-bottom:14px}.skeleton-line.short{width:46%}
+.skeleton-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:30px;padding:22px 24px;border-top:1px solid var(--line)}
+.skeleton-row .skeleton-shape{height:15px}
+@media(max-width:650px){.skeleton-cards{grid-template-columns:1fr}.skeleton-row{gap:12px;padding:20px 14px}.skeleton-hero{min-height:350px}}
+@media(prefers-reduced-motion:reduce){.route-stage,.home-hero,.decision-card,.home-indicators,.home-page .overview-grid,.home-meters,.meters-panel,.meters-comparisons .meter-insight,.profile-hero,.profile-card,.detail-redesign>.panel,.detail-redesign>.meter-hero,.chat-launcher,.skeleton-shape{animation:none}}

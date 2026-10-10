@@ -1,0 +1,45 @@
+name: verify
+on: [push, pull_request]
+jobs:
+  system:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ANTHROPIC_API_KEY: ci-placeholder-not-a-real-key
+      OPENAI_API_KEY: ci-placeholder-not-a-real-key
+      AI_ALLOW_NEW_REQUESTS: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.x'
+          cache-dependency-path: backend/go.sum
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: docker compose up -d --wait db
+      - name: Seed isolated browser-test caches without AI requests
+        working-directory: backend
+        env:
+          CI_SEED_DATABASE_URL: postgres://energy:energy-local-only@localhost:54329/energy?sslmode=disable
+        run: go run ./cmd/ci-seed
+      - run: docker compose up --build -d --wait
+      - name: Backend unit and PostgreSQL integration
+        working-directory: backend
+        env:
+          TEST_DATABASE_URL: postgres://energy:energy-local-only@localhost:54329/energy?sslmode=disable
+        run: |
+          go vet ./...
+          go test -race ./... -count=1
+      - working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+      - if: failure()
+        run: docker compose logs --tail=100
+      - if: always()
+        run: docker compose down
