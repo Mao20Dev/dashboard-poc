@@ -3,16 +3,20 @@ server {
  listen [::]:8080;
  server_name _;
  root /usr/share/nginx/html;
+ resolver ${NGINX_LOCAL_RESOLVERS} valid=10s;
+ resolver_timeout 5s;
+ set $api_backend "${API_UPSTREAM}";
  add_header X-Content-Type-Options nosniff always;
  add_header Referrer-Policy same-origin always;
  location /api/ {
-  proxy_pass http://${API_UPSTREAM};
+  proxy_pass http://$api_backend;
+  proxy_connect_timeout 5s;
   proxy_set_header Host $http_host;
   proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
   proxy_read_timeout 65s;
   add_header Cache-Control "no-store" always;
  }
- location = /healthz { proxy_pass http://${API_UPSTREAM}/healthz; }
+ location = /healthz { proxy_pass http://$api_backend; proxy_connect_timeout 5s; }
  location /assets/ { try_files $uri =404; expires 1y; add_header Cache-Control "public, immutable"; }
  location /models/ { try_files $uri =404; expires 1d; }
  location /fonts/ { try_files $uri =404; expires 7d; }

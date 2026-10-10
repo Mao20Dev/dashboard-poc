@@ -8,6 +8,7 @@ RUN npm run build
 FROM nginxinc/nginx-unprivileged:alpine
 ENV API_UPSTREAM=api:8080
 ENV NGINX_ENVSUBST_OUTPUT_DIR=/tmp/nginx-conf
+ENV NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1
 RUN mkdir -p /tmp/nginx-conf
 COPY deploy/nginx.conf /etc/nginx/nginx.conf
 COPY deploy/default.conf.template /etc/nginx/templates/default.conf.template
