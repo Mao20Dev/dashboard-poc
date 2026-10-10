@@ -1,8 +1,27 @@
-import {test,expect,type Page} from '@playwright/test'
+import {test,expect,type Page} from './fixtures'
 async function enter(page:Page,id='M-109'){
  await page.goto('/');await page.locator('.demo-button').click();await expect(page.locator('.home-page')).toBeVisible()
  await page.goto('/#/meter/'+id);await expect(page.locator('.all-signals .signal-row')).toHaveCount(4)
 }
+
+test('an older explanation without evidence links keeps the meter usable',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message))
+ await page.route('**/api/v1/meters/M-109',async route=>{
+  const response=await route.fetch(),body=await response.json()
+  body.anomalies[0].explanation.interpretation=[
+   {code:'legacy-null',text:'Interpretación histórica sin referencias.',evidence_ids:null},
+   {code:'legacy-missing',text:'Otra observación histórica.'},
+   {code:'valid',text:'Observación vinculada a consumo.',evidence_ids:[body.anomalies[0].evidence[0].id]}
+  ]
+  await route.fulfill({json:body})
+ })
+ await enter(page)
+ await page.locator('.interpretation-section summary').click()
+ await expect(page.locator('.interpretation-section .analysis-paragraph')).toHaveCount(3)
+ await expect(page.locator('.interpretation-section .evidence-links a')).toHaveCount(1)
+ await expect(page.locator('.changes-panel')).toContainText('5.380,8')
+ expect(errors).toEqual([])
+})
 test('hover synchronizes the exact timestamp and all four real values; keyboard also works',async({page})=>{
  await enter(page)
  const response=await page.request.get('/api/v1/meters/M-109/readings?limit=1000');const points=(await response.json()).items

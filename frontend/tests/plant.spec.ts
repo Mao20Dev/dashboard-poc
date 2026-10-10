@@ -1,6 +1,6 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from './fixtures'
 
-test.use({launchOptions:process.platform==='win32'?{args:['--enable-gpu','--use-angle=d3d11']}:{},viewport:{width:1600,height:1050}})
+test.use({viewport:{width:1600,height:1050}})
 
 test('baked plant uses live meters, sleeps at rest, follows camera and navigates inside the app',async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message))
@@ -48,11 +48,11 @@ test('baked plant uses live meters, sleeps at rest, follows camera and navigates
  expect(errors).toEqual([])
 })
 
-test('plant card fits touch screens and supports direct detail navigation',async({browser})=>{
- const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true})
- const page=await context.newPage();await page.goto('http://127.0.0.1:5173')
+test('plant card fits touch screens and supports direct detail navigation',async({browser,baseURL})=>{
+ const context=await browser.newContext({baseURL,viewport:{width:390,height:844},isMobile:true,hasTouch:true})
+ const page=await context.newPage();await page.goto('/')
  await page.getByRole('button',{name:'Entrar a la demo',exact:true}).click()
- await expect(page.locator('.home-page')).toBeVisible();await page.goto('http://127.0.0.1:5173/#/meters')
+ await expect(page.locator('.home-page')).toBeVisible();await page.goto('/#/meters')
  await page.getByRole('button',{name:'Vista de planta',exact:true}).click()
  await expect(page.locator('.eq-plant')).toHaveAttribute('data-ready','true')
  await page.getByRole('link',{name:'Ver medidor M-109',exact:true}).tap()

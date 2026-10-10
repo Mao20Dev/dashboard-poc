@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from './fixtures'
 
 test('bee responds to the cursor, changes theme and disposes when entering the demo',async({page})=>{
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message))

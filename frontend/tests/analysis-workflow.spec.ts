@@ -1,5 +1,5 @@
 import {choose} from './select-helper'
-import {test,expect,type Page} from '@playwright/test'
+import {test,expect,type Page} from './fixtures'
 
 async function enter(page:Page){await page.goto('/');await page.locator('.demo-button').click();await expect(page.locator('.home-page')).toBeVisible()}
 

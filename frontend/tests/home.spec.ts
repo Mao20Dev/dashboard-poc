@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from './fixtures'
 test('home has one entry to Sonnet, retains conversation and presents real priorities',async({page})=>{
  const sent:any[]=[]
  await page.route('**/api/v1/ai/chat',async route=>{

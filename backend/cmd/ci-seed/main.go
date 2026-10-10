@@ -55,11 +55,16 @@ func main() {
 			f := &report.Findings[i]
 			f.Explanation = (&explain.Client{Provider: "rules"}).Explain(ctx, *f)
 			if provider != "rules" {
+				ids := make([]string, 0, len(f.Evidence))
+				for _, evidence := range f.Evidence {
+					ids = append(ids, evidence.ID)
+				}
+				f.Explanation.SummaryEvidenceIDs = ids
 				f.Explanation.Source = provider
 				f.Explanation.Model = model
 				f.Explanation.Summary = fmt.Sprintf("Fixture de prueba %s: %s", provider, f.Explanation.Summary)
 				f.Explanation.Headline = "Fixture: revisar las señales del medidor"
-				f.Explanation.Interpretation = []domain.Guidance{{Code: "fixture", Text: "Interpretación sintética para verificar el cambio de proveedor sin llamadas externas.", EvidenceIDs: f.Explanation.SummaryEvidenceIDs}}
+				f.Explanation.Interpretation = []domain.Guidance{{Code: "fixture", Text: "Interpretación sintética para verificar el cambio de proveedor sin llamadas externas.", EvidenceIDs: ids}}
 			}
 		}
 		must(s.Complete(ctx, run, report))

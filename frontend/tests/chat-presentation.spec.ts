@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from './fixtures'
 import {answerSections,chatCards} from '../src/chat-presentation'
 import type {Finding,Meter} from '../src/types'
 test('answer sections keep unrecognized prose and classify explicit headings only',()=>{

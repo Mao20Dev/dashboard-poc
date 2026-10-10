@@ -1,4 +1,4 @@
-﻿import {test,expect} from '@playwright/test'
+import {test,expect} from './fixtures'
 
 test('Sonnet follows visible entry points without requests and avoids profile controls',async({page})=>{
  let paidRequests=0

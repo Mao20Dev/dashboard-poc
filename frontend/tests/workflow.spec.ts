@@ -1,5 +1,5 @@
 import {choose} from './select-helper'
-import {test,expect} from '@playwright/test'
+import {test,expect} from './fixtures'
 test.beforeEach(async({page})=>{await page.route('**/api/v1/ai/chat',route=>route.fulfill({json:route.request().method()==='GET'?{enabled:true,model:'test-sonnet',daily_limit:20,used_today:0}:{answer:'Respuesta de prueba sin llamadas externas.',model:'test-sonnet',sources:[],cached:true}}))})
 async function enter(page:import('@playwright/test').Page){await page.goto('/');await page.getByRole('button',{name:'Entrar a la demo',exact:true}).click();await expect(page.getByRole('heading',{name:'Hola, Uribe.'})).toBeVisible()}
 test('home and meters have distinct content, navigation and direct sidebar control',async({page})=>{
@@ -23,6 +23,10 @@ test('home and meters have distinct content, navigation and direct sidebar contr
  await page.getByRole('button',{name:'Vista de planta',exact:true}).click();await expect(page.locator('.eq-plant')).toHaveAttribute('data-ready','true')
  await expect(page.locator('.eq-plant-node')).toHaveCount(12)
  await page.locator('.eq-plant-node').filter({hasText:'M-112'}).focus()
+ await expect(page.locator('.eq-plant-card a')).toHaveAttribute('href','#/meter/M-112')
+ // Moving the pointer toward a keyboard-opened card must not change its target.
+ await page.getByRole('link',{name:'Ver medidor M-108',exact:true}).hover()
+ await expect(page.locator('.eq-plant-card a')).toHaveAttribute('href','#/meter/M-112')
  await page.locator('.eq-plant-card a').click()
  await expect(page.locator('.meter-page h1')).toContainText('M-112')
  await expect(page.getByRole('dialog')).toHaveCount(0)

@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from './fixtures'
 
 test('profile previews edits, discards drafts and persists identity and photo',async({page})=>{
  await page.goto('/');await page.locator('.demo-button').click();await expect(page.locator('.home-page')).toBeVisible()

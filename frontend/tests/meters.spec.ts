@@ -1,6 +1,4 @@
-import {test,expect,type Page} from '@playwright/test'
-
-test.use({launchOptions:process.platform==='win32'?{args:['--enable-gpu','--use-angle=d3d11']}: {}})
+import {test,expect,type Page} from './fixtures'
 
 async function enter(page:Page){
  await page.goto('/')

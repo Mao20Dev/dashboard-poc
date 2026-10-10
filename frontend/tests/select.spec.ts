@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from './fixtures'
 
 test('custom selectors support keyboard, dismissal, themes and mobile without incidental analysis',async({page})=>{
  let calls=0
